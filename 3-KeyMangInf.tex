@@ -1,0 +1,119 @@
+\documentclass[14pt]{beamer}
+% \useoutertheme{miniframes}
+
+\usepackage{ngerman}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+% \usepackage{amsmath,amsfonts,amssymb}
+\usepackage{url}
+
+% disable Navigation at the bottom
+\beamertemplatenavigationsymbolsempty
+
+% page numbers
+% \setbeamertemplate{footline}[frame number]
+% \setbeamertemplate{footline}
+\setbeamertemplate{headline}
+
+% style for source code
+\usepackage{listings}
+\newcommand{\Hilight}{\makebox[0pt][l]{\color{light-gray}\rule[-4pt]{1.0\linewidth}{12pt}}}
+\usepackage[framed,numbered]{mcode}
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.80}
+  
+% use {\mono lorem} to set something in monospace
+\newcommand{\mono}[1]{\ttfamily\fontsize{14}{14}\selectfont #1}
+
+% wanna use Metapost?
+\makeatletter
+\newcommand\@ptsize{12}
+\makeatother
+
+\usepackage{mflogo}
+\usepackage{emp}
+\DeclareGraphicsRule{*}{mps}{*}{}
+
+
+\title{3- Key Management and Infrastructure}   
+\author{Mathias Ravn Tversted} 
+\date{\today} 
+
+% Why do we not use the same key all the time
+
+% Key distribution centers
+	% Why do we have them, and how do they work
+	% Trust / reliability
+
+% Certification authorities
+	% Who has which keys and what happened when a certificate is issued
+	% How is a certificate issued?
+
+% Certificate chains
+	% How does one get the CA public key in the first place
+
+% How to identify users
+	% Something you know (passwords)
+	% Something you have (hardware token)
+	% Something you are (biometrics)
+
+% Passwords: Issues/attacks when a password is
+	% chosen, stored by the user, transported to server, stored by server
+
+% Hardware
+	% Tamper resistant/tamper evident hardware
+	% Two-factor authentication
+
+% Biometrics: What is it, what can it be used for
+
+
+%===================================
+\begin{document}
+	\section{Key Distribution Centers}
+		\frame{\frametitle{Key Distribution Problems}
+			Public key cryptography depends on the distribution of keys. Everyone having to store everyone else's keys scales badly. One way to solve this problem is by having centralised databases of keys. These are called \textit{Key Distribution Centers} or (KDC). 
+		}
+
+		\frame{\frametitle{Key Distribution Centers}
+			Key Distribution Centers have the following properties
+			\begin{itemize}
+				\item Based on Secret-Key Systems
+				\item Every user shares $K_A$ with the KDC
+				\item When A wants to talk to B, KDC generates $E_{K_A}(K)$ for A, $E_{K_B}(K)$ for B. 
+				\item All users must trust KDC completely
+				\item If the KDC is down or compromised, the entire network is fåkked. 
+			\end{itemize}
+		}
+
+	\section{Certification Authorities}
+			\frame{\frametitle{Certification Authorities}
+				We can replace the previous example with the following protocol
+				\begin{itemize}
+					\item Key $K_{AB}$ is replaced by pair $(sk_B, pk_B)$. Here $pk_B$ is public. 
+					\item A sends session key $E_{pk_B}(K)$ to B. 
+				\end{itemize}
+				How do we distribute these? Assume we have a \textit{Certification Authority} CA with the pair $(sk_{CA}, pk_{CA})$. Everyone then gets a copy of $pk_{CA}$. Then begins the hard part of authenticating yourself with the CA. This might even be done in person. The CA then issues cert $ID_A$, and $pk_A$ and then the signature $S_{sk_{CA}}(ID_A, pk_A)$. Now everyone can check to see if the public key is legitimate. 
+			}
+
+			\frame{\frametitle{Certificate Chains: Or Who Verifies The Verifiers}
+				If two people do not have certificates issued from the same CA, they can use what's called Certificate Chains to solve this problem. If CA's certifiy each other's public keys. 
+				If user $A$ has $CA_1$ and $B$ has $CA_2$. If $A$ receives $Cert_{CA_2}(B, pk)$ then if he also gets $Cert_{CA_1}(CA_2, pk_{CA_2})$ then $A$ can verify that certificate. A chain has the from
+				$$
+					Cert_{CA_1}(B, pk_B), Cert_{CA_2}(CA_1, pk_{CA_1}).....
+				$$
+				It should be noted that this requires one to trust the initial part of the chain in the first place. 
+			}
+
+		\section{How to identify users}
+				\frame{\frametitle{What they know: Passwords}
+					Passwords identity users from what they know. 	
+				}
+
+				\subsection{Passwords}
+
+
+
+
+\end{document}
+
