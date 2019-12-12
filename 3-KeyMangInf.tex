@@ -106,11 +106,32 @@
 			}
 
 		\section{How to identify users}
-				\frame{\frametitle{What they know: Passwords}
-					Passwords identity users from what they know. 	
+				\frame{\frametitle{Who they are? Biometric Security}
+					Biometric Security is when a system makes use of fingerprints, voice, facial recognition and other biological factors unique to an individual to identify them. This has a privacy downsides, and if the information is leaked, it could still be used to attack systems. 
 				}
 
-				\subsection{Passwords}
+				\frame{\frametitle{Something They Have: Hardware Security}
+					Hardware may have their own keys, such as for RSA encryption, which is only accessible through the CPU. It is also possible to make \textit{tamper evident} hardware, which can tell if it has been tampered with. 
+					\textbf{Two-factor authentication}: Two-factor authentication works by demanding that the user authenticate themselves not only with a password, but also by possession of a piece of hardware, such as a smartphone. This means that even if the password is compromised, it is still possible to deny intruders access. 
+				}
+
+				\frame{\frametitle{Password Security}
+				Passwords identity users from what they know. And generally we want to protect passwords from the following 4 attacks
+				\begin{itemize}
+					\item The adversary can guess and verify their guesses
+					\item The password is transmitted in an insecure manner, and the adversary can intercept it
+					\item The password is stored in an insecure manner, and can be stolen from the user
+					\item The password can be stolen from the verifier
+				\end{itemize}				
+			}
+
+			\frame{\frametitle{Password security}
+				The previously listed problems can be remedied with the following:
+				\textbf{Guessing passwords}: This can be remedied with password rules. However, the more password rules, the fewer combinations people have to guess. Having ample length and characters (but mostly length) and a database of vulnerable passwords that are forbidden seems to be the best policy
+				\textbf{Insecure Transmission}: Use encryption
+				\textbf{Insecure storage by the user}: Could be helped by using other forms of authentication, such as two-factor authentication.  
+				\textbf{Stealing from verifier}: Salt and hash passwords, store them encrypted and use good security policies.  
+			}
 
 
 
