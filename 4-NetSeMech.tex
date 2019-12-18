@@ -135,7 +135,19 @@
                         \item \textbf{Alert protocol}: Error messages
                     \end{itemize}
                 \end{frame}
-                
+
+                \begin{frame} 
+                    \frametitle{One-sided SSL Handshake}
+                        \begin{itemize}
+                            \item Client picks random $n_C$
+                            \item Server picks random $n_S$
+                            \item Server sends $n_S, Cert_S$
+                            \item Client picks random $pms$, sends $E_{pk_S}(pms)$
+                            \item Server computes $K = f(pms, n_C, n_S)$ and sends $MAC_K(view_S)$
+                            \item Client sends $MAC_K(view_C)$
+                        \end{itemize}
+                \end{frame}
+
                 \begin{frame}
                     \frametitle{Handshake Protocol}
                         The actual key-exchange protocol worksas follows. This is but one of the variations of the handshake protocol
@@ -171,6 +183,73 @@
                     An adversary that sits between $C$ and $S$ can have done nothing except forward all messages unchanged. 
                     Conversely, let us see things from the point of view of an honest $S$ who wants to talk to $C$. He sees a signature from $C$ on a ciphertext $c$ and the nonces, and since he chose one of the nonces himself, he knows the signature and hence c was indeed produced now by $C$, i.e., it is not a replay. Furthermore, an honest $C$ will send a \textit{pms} to only one server, and $S$ will not himself send pms to anyone. Therefore, when $S$ receives a message with a MAC that verifies using pms, he knows this MAC comes from $C$. If furthermore the MAC can be verified w.r.t. all messages $S$ has sent and received it must be the case that $C$ has seen this same of messages on his side. Therefore, as above, any adversary that sits between $C$ and $S$ can have done nothing except forward all messages unchanged.
             \end{frame}
+
+%===================================
+% Diffie-Hellmann and IPSEC
+    \begin{frame}
+        \frametitle{IPSEC}
+            \begin{itemize}
+                \item Sits on Transport Layer
+                \item Sets up secure connection, known as \textit{Security Association}
+                \item \textit{Internet Key Exchange} (IKE)
+                \item IKE is independent of IPSEC
+                \item Mostly uses the \textit{Diffie-Hellman Key Exchange}
+            \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+           \frametitle{(Authenticated) Diffie-Hellmann Key Exchane}
+            Choose $g \in [0, p-1]$. Then execute the following protocol
+            \begin{itemize}
+                \item $C$ chooses a random number $a$ and sends $g^a \mod p$ and certificate to $S$. 
+                \item $S$ chooses $b$ and sends $g^b \mod p$ and certificate to $C$
+                \item $C$ computes $(g^b \mod p)^a \mod p$ based on what he got from $S$ and sends own random choice
+                \item $S$ computes $(g^a \mod p)^b \mod p$ These values are equal to $g^{ab} \mod p$. This is now the common key
+                \item $C, S$ sign all messages they have seen so far and send them to each other
+                \item If both verify, then everything is OK
+            \end{itemize}
+            Vulnerable to preprocessing attack \textit{Index Calculus} algorithm. So choose fresh primes.
+    \end{frame}
+
+
+%===================================
+% Difference between SSL and IPSEC
+
+    \begin{frame}
+        \frametitle{Difference between SSL and IPSEC}
+        % PUT DETTE HER LÆNGERE OP ET STED HVOR DET ER RELEVANT OG TAL OM HVAD DER ER OG HVAD DER IKKE ER FORWARD SECURE
+        \textbf{Forward Security definition}: "Forward security means that the security of the session you do now cannot be compromised even if the adversary steals a long-term secret key some time in the future"
+        \begin{itemize}
+            \item SSL protects applications, even from other applications or users on the machine
+            \item Applications must know how to use SSL
+            \item IPSEC protects \textit{all} applications, even if they are not aware of it. 
+            \item Data is always never secure once it leaves the encrypted tunnels
+            \item SSL allows one-way authentication, so that the client doesn't need a certificate
+            \item But client can use a password
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Password authenticated key exchange}
+            Password authenticated key exchange can be used to authenticate a user, so it's not just secure, but also the client is authenticated. The following is based on Diffie-Hellmann and is a simplified version of Bellare et al.
+            \begin{itemize}
+                \item $C$ chooses random number $a$ and sends $A = E_{pw}(g^a \mod p)$
+                \item $S$ chooses $b$ at random and sends $B = E_{pw}(g^b \mod p)$
+                \item $C$ decrypts $B$ with password $pw$ and computes $(g^b \mod p)^a \mod p$ based on result of decryption and his own random choice
+                \item $S$ computes $(g^a \mod p)^b \mod p$. These are equal and can be used as common key
+                \item The parties then continue verifying and confirming like in Diffie Hellmann
+            \end{itemize}
+            Since adversary cannot easily verify guess. This is protected against dictionary attacks. 
+
+    \end{frame}
+
+
+%===================================
+% Applications, document based secure formats versus secure tunnels
+    \begin{frame}
+        \frametitle{Applications, document based secure formats versus secure tunnels}
+            Indsæt stuff her. Sikkert ikke tid til det
+    \end{frame}
 
 
 \end{document}
