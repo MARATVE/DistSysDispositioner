@@ -139,11 +139,78 @@
     \end{frame}
 
     \begin{frame}
-        \frametitle{Models for Security Policies}
+        \frametitle{Lattice Model}
+            A lattice consists of a finite set $S$ and a relation $\leq$. For any elements $a, b, c \in S$ it must hold that
             \begin{itemize}
-                \item \textbf{Lattice approach}
+                \item $a \leq a$
+                \item $a \leq b \land b \leq a \implies a = b$
+                \item $a \leq b \land b \leq c \implies a \leq c$ 
+            \end{itemize}
+            $S$ is the set of privilees and rights. A relation $a \leq b$ means that $a$ has at least as many rights as $b$. A lattice does not require that the relation is defined for all pairs. 
+            For it to be a lattice, it is also required that $a, b \in S$ we have a \textit{greatest lower bound}, for $a, b, c \in S$, such that $c \leq a \land c \leq b$ and for any other $c'$, we have $c' \leq c$. 
+            There exists some \textit{least upper bound}, for $a, b, d \in S$ such that $a \leq d, b \leq d$, for any other $d'$, we have $d \leq d'$. 
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Using the Lattice model}
+            There are two ways of using the Lattice model to organise security policy: 
+            \textbf{Subjects}: Define \textit{subjects} and \textit{objects}. Classify subjects and objects and position them in the lattice. A subject $s$ with classification $C(s)$ may do a certain operation on object $o$ iff $C(s) \geq C(o)$ or iff $C(s) \leq C(o)$. 
+            \textbf{Information flow}: Assign a position to different parts of the system, and let the relation be information flow. Higher position means "more secret". You could also do this for authenticity, then it becomes "more reliable"    
+    \end{frame}
+    \begin{frame}
+        \frametitle{Bell-Lapadula Model and Biba model}
+            An example of the Lattice model, is the \textit{Bell-Lapadula Model} convinced for military applications. 
+            Consists of security levels that are linearly ordered, such as $public \leq secret \leq top\-secret$. The model then defines two rules (sometimes known as simple security property, and the * property). May be unwieldy in practice.
+            \begin{itemize}
+                \item \textbf{No read up}: Subject $s$ may read from object $o$ iff $C(s) \geq C(o)$
+                \item \textbf{No write down}: Subject $s$ may write to object $o$ iff $C(s) \leq C(o)$
+            \end{itemize}
+            Another model is the \textit{Biba model}, which focuses on integrity. The higher levels are the ones that contain the most reliable inforamtion. In order to maintain this, the Biba model has two rules
+            \begin{itemize}
+                \item \textbf{No read down}: Subject $s$ may read from object $o$ iff $C(s) \leq C(o)$
+                \item \textbf{No write up}: Subject $s$ may write to object $o$ iff $C(s) \geq C(o)$
+            \end{itemize}
+            Information must not flow from lower to higher ones.     
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Other models}
+            \begin{itemize}
+                \item \textbf{Chinese Wall}: Creates a wall between different subjects. There is defined a relation which says if someone is allowed to access something at all. Such as people who compete in a business setting. 
+                \item \textbf{Prevent-Detect-Recover}: Splits policy into 3 parts. One describes how to prevent attacks, one describes how to detect them, and one describes how to recover
+                \item \textbf{Seperation of Duty}: Comes in two flavours, \textit{Dual Control} and \textit{Functional Separation}. Dual Control says that actions are possible if multiple people have approved it. Functional seperation is where an action requires multiple people at different times. 
             \end{itemize}
     \end{frame}
+
+\section{Access Control}
+        \begin{frame}
+            \frametitle{Access Control}
+                The most generic way is an \textit{Access Control Matrix}. Let $A$ be a matrix with a row for each subject $s$ and a column for each object $o$, then $A[s, o]$ is a list of permitted operations for $s$ on $o$. 
+                There are two approaches to doing this in practice
+                \begin{itemize}
+                    \item \textbf{Access Control Lists}. Stored with each object, is a column assigned to the object. Called an access control list. Makes it hard to determine the total permissions of each subject. This is the approach of UNIX systems. 
+                    \item \textbf{User Capabilities}: We store for each subject the row assignedto the subject. Called user capabilities. Makes it easy to determine permissions for users, but not for objects. 
+                \end{itemize}
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Dynamic Access Control}
+                Who can update the ACM? There is \textit{mandatory access control}, where subjects cannot the matrix. There is \textit{discretionary access control}, where subjects have the power to update parts of the matrix. 
+                We can talk about \textit{primitive operations} on access control matrices. These are create/delete subject, add/delete access right $r$. Assume a fixed finite number of access rights. We can now define a \textit{command} with the following format
+                Let $C(\text{parameter list } l) = \{r_1 \in A[s_1, o_1], ... , r_n \in A[s_n, o_n]\}$ followed by a list of primitive operations. This corresponds to the list of operations will be executed if the if the conditions are satisfied. 
+        \end{frame}
+        \begin{frame}
+            \frametitle{Undecidability and safety}
+                Consider a fixed set of commands $com_1, ..., c_t$ and an initial ACM $A$. For a given access right $r$, does there exist a set of commands that will transform $A$ into $A'$ where $r \in A'[s, o]$ for $s, o$ but $r \notin A[s, o]$? If not, then $A$ is \textit{safe} w.r.t to $r$. 
+                The following properties are provable
+                    \begin{itemize}
+                        \item If commands contains more than one operation, then it is undecidable if $A$ is safe w.r.t to $r$
+                        \item If all commans only contain a single primitive operation, it is decidable if $A$ is safe w.r.t to $r$
+                        \item If there a fixed upper bound ahead of time on the number of subjects and objects, then it is decidable if $A$ is safe w.r.t to $r$    
+                    \end{itemize}
+                    The undecidability, is that the states of $A$ can be used as the states of a Turing Machine and the operations are the inputs. Does the state machine $A$ then halt on an operation $r$? So keep it simple. 
+        \end{frame}
+
 
 \end{document}
 
