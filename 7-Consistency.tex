@@ -1,7 +1,7 @@
 \documentclass[14pt]{beamer}
 % \useoutertheme{miniframes}
 
-
+\newcommand{\N}{\mathbb{N}}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
@@ -50,8 +50,91 @@
 
 
 %===================================
+% Unstructured P2P as motivation (messages arrive in different order)
+
+% Consistency models and how to implement them
+    % Model: Safety property phrased abstractly
+    % Implementation: How to implement it
+
+% FIFO
+
+% Causal 
+    % Causal-past relation
+    % How to implement with vector clocks
+
+% Total order
+    % What how
+
+%===================================
+\section{Unstructured Peer to Peer}
+    \begin{frame}
+        \frametitle{Floodin Network}
+            A flooding network is a network where messages are flooded. This guarantees that if a message is sent, it will eventually be delivered to all correct processes. When receiving a new message, it is simply sent to all other peers. This means that we cannot guarantee total ordering since messages can overtake each other. 
+    \end{frame}
+    \begin{frame}
+        \frametitle{Flood Protocol (Ideal Functionality)}
+            \textbf{Send}: Process $P_i$ gives input of form $(P_i, m)$ on user port $Flood_i$
+            \textbf{Deliver} Party $P_i$ gets output of form $(P_j, m)$ on user port $Flood_j$. Message $m$ sent by $P_J$ was delivered to $P_i$ by (flood)
+            We assume that the system has the following properties
+            \textbf{User Contract}: We require from the process $P_i$ that it does not send the same message twice. When the user keeps its contract, we require that the flooding system has the following safety and liveness properties. We also require that in every finite time interval a party sends at most a finite number of messages.
+            \textbf{Safety}: If a correct $P_j$ outputs $(P_i, m)$ then earlier $P_i$ sent $(P_i, m)$
+            \textbf{Liveness}: If correct $P_i$ sends $(P_i, m)$ then eventually all correct $P_j$ deliver $(P_i, m)$
+    \end{frame}
+
+%===================================
+\section{Consistency models}
+%===================================
+\section{FIFO}
+    \begin{frame}
+        \frametitle{First In, First Out (FIFO)}
+            We want to preserve the order of communications. We can do this through FIFO (First In, First Out). 
+            \textbf{FIFO}: If a correct $P_i$ sends $(P_i, m)$ and later sends $(P_i, m')$ then it holds for all correct $P_j$ that if they deliver $(P_i, m')$, then they delivered $(P_i, m)$ earlier. 
+            User Contract and Liveness is the same as for \textit{Flood}. 
+    \end{frame}
+    \begin{frame}
+        \frametitle{FLOOD2FIFO: This Time It's Protocol}
+            \begin{itemize}
+                \item Each party $P_i$ sets counter $c_i = 0$. This counts number of \textit{messages sent}ialises $n$ counters $r_{i, j} = 0$ for $j = 1, ..., n$ These track how many messages $P_i$ received from $P_j$
+                \item $P_i$: When sending message $m$, let $c_i = c_i + 1$. Send $P_i, c_i, m$ on floodin network. So tag each message with seq number.
+                \item $P_i$. When receiving $(P_j, c, m)$ store it in buffer until $r_{i, j} = c + 1$. Now let $r_{i, j} = r_{i, j} + 1$ and output $(P_j, m)$. Since $r_{i, j}$ is the number of messages $P_i$ received from $P_j$, if $r_{i, j} = c + 1$ then $(P_j, c, m)$ is the next message. 
+            \end{itemize}
+    \end{frame}
 
 
+%===================================
+\section{Casuality}
+    \begin{frame}
+        \frametitle{Causuality}
+            Just because messages arrive in FIFO order, does not mean that this is a meaningful order. \textit{Casual order} looks at which messages could have \textit{caused} other messages. This could be things such as messages in a messaging application. But we need \textit{vector clocks}, before we can proceed. 
+    \end{frame}
+    \begin{frame}
+        \frametitle{Vector Clocks}
+            For a system of $n$ parties, a \textit{vector clock} is a vector $VectorClock \in \N^n$ where $VectorClock[P_j] \in \N$ where that is the entry associated with party $P_j$. Since each party has a vector clock, VectorClock($P_i$) is the vector clock of $P_i$.
+            $VectorClock(P_i)[P_j] = s$ means that $P_i$ knows that $P_j$ has sent $s$ messages. 
+            \begin{itemize}
+                \item When $P_i$ sends message $m$ it increments $VectorClock(P_i)[P_i]$ by one
+                \item When $P_i$ sends message $m$ it sends along $VectorClock(P_i)$. When $P_i$ sends $m$ that message can be influenced by exactly the messages that have influenced $P_i$ at the time $P_i$ sends a message. 
+                \item By sending the vector clock with the message, you can determine which messages could have influenced $m$
+                \item Formally: $s = VectorClock(P_i, m)[P_j]$ messages from $P_j$ could have influenced $m$
+            \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Vector Clocks}
+            \begin{itemize}
+                \item Any receiver $P_r$ knows that it is safe to deliver $(P_i, m)$ once it delivered $s$ messages from $P_j$ it is $s$ that could have influenced $m$
+                \item To keep track of how many messages were delivered from each party $P_j$ keeps a vector clock $Delivered(P_j)$, where $Delivered(P_j)[P_i]$ is how manymessages $P_j$ delivered from $P_i$. This gives the rule that $P_j$ can deliver $(P_i, m)$ once it holds for all $P_k$ that $Delivered(P_j)[P_k] \geq VectorClock(P_i, m)[P_k]$
+            \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Causal-Past Relation}
+                
+        
+    
+    \end{frame}
+%===================================
+\section{Total order}
 
 \end{document}
 
