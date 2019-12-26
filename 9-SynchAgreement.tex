@@ -41,6 +41,24 @@
 \date{\today} 
 
 
+% Round-based model (SKIP, JUST ASSUME)
+
+% Synchronous Broadcast
+    % Definition
+
+% Dolev-Strong protocol
+
+% PROBABLY EITHER ONE OF THESE
+
+% Synchronous Broadcast From Authenticated channels
+    % Emulating signature
+
+% OR THIS ONE
+
+% Lower-bound on broadcast
+    % -t < n/3
+
+
 %===================================
 \begin{document}
 
@@ -48,8 +66,43 @@
 
 \frame{\frametitle{Table of contents}\tableofcontents} 
 
+%===================================
+
+\section{Synchronous Broadcast}
+    \begin{frame}
+        \frametitle{Synchronous Broadcast: The Goal}
+            With synchronous broadcast, we are trying to solve an agreement problem. We are looking for the following properties
+            \begin{itemize}
+                \item \textbf{Agreement}: All honest parties make the same decision
+                \item \textbf{Validity}: The decision must be sensible in some sensible
+                \item \textbf{Termination}: If all parties start running the protocol, then all honest parties must end up with some decision
+            \end{itemize}
+    \end{frame}
+\begin{frame}
+    \frametitle{Synchronous Agreement}  
+        And we are looking at the following agreement problems:
+        \textbf{Broadcast}: The sender $S$ sends a single message. All receivers a message or NoMsg and agree on an output. If $S$ is honest, then only the message can be output as coming from $S$. If $S$ is honest, no one outputs NoMsg. 
+        
+        \textbf{Byzantine Agreement}: There are $n$ parties $P_1, ..., P_n$. Each has bit $b_i$ as input. They output a common decision bit $d$. All parties should agree on $d$. If all parties have the same input, they should all agree. 
+\end{frame}
+
+    \begin{frame}
+        \frametitle{Definition of broadcast}
+            There are $n$ parties. $P_1, ..., P_n$. One sends message $m$ to all the other parties. We are looking for \textit{agreement, validity, termination}. 
+    \end{frame}
 
 %===================================
+
+\section{Dolev-Strong protocol}
+
+%===================================
+
+\section{Synchronous Broadcast from Authenticated Channels}
+
+%===================================
+
+\section{Lower-Bound on broadcast}
+
 
 
 

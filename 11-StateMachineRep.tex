@@ -42,6 +42,26 @@
 
 
 %===================================
+
+% What is a state machine
+
+% What is a replicated state machine
+    % Replicated on several servers: Why does it have to be a state machine?
+
+% Keeping consistency
+% Solution: Totally-ordered broadcast
+
+% Totally-ordered broadcast
+    % What is it?
+    % EITHER
+        % Synchronous implementation: Round robin sequencer
+        % Asynchronous implementation: Fig 11.4. Core-set selection. Large common subsets of inputs, async BA to nail down core set
+
+% Client-centric consistency
+    % What and how?
+
+
+
 \begin{document}
 
 \frame{\titlepage} 
@@ -50,6 +70,100 @@
 
 
 %===================================
+\section{State machine}
+        \begin{frame}
+            \frametitle{Definition of a state machine}
+                A state machine consists of 
+                \begin{itemize}
+                    \item A set of states
+                    \item Initial state $State_0 \in States$
+                    \item Set of $Inputs$
+                    \item Set of $Outputs$
+                    \item Transition function $T: States \times Inputs \rightarrow States \times Outputs$
+                \end{itemize}
+        \end{frame}
+%===================================
+\section{Replicated state machine}
+        \begin{frame}
+            \frametitle{IF and definition of Replicated State Machine}
+                We have I/O ports $RSM_i$ and the following ports
+                \begin{itemize}
+                    \item $\forall i Received_i$ outputs what IF has Received
+                    \item $Process$ says what should be processed next
+                    \item $Deliver_i$ instructs IF to deliver the next message to $S_i$
+                \end{itemize}
+                It has the following safety requirements:
+                    \begin{itemize}
+                        \item \textbf{Validity}: If honest server outputs $(y_i, ..., y_n)$ Then $\exists (x_1, ..., x_n) : (y_1, ..., y_n) = M(x_1, ..., x_n)$
+                        \item \textbf{Agreement}: If honest server outputs $(y_1, ... y_n)$ then all other servers output at least some prefix of that, or vice versa
+                    \end{itemize}
+        \end{frame}
+    \begin{frame}
+        \frametitle{Ideal Functionality of an RSM}
+            \begin{itemize}
+                \item Let $State = State_0$. Foreach $RSM_i$, $Q_i = \emptyset$. 
+                \item $Q_i$ is the outputs for $S_i$, which has not yet been delivered. Let $UnProcessed = \emptyset$
+                \item On input x to $RSM_i$, output x on $Received_i$, add x to $UnProcessed$
+                \item On input x on $Process$. If $x \in Unprocessed$, compute $(State', y) = T(state, x)$. Add $y$ to $Q_i$. Pop x from $UnProcessed$
+                \item On input $Deliver_i$, where $Q_i \neq \emptyset$, remove first $y_i \in Q_i$ and output $y$ on $RSM_i$
+            \end{itemize}
+    \end{frame}
+%===================================
+\section{Consistency: TOB}
+    \begin{frame}
+        \frametitle{Consistency}
+            In order to keep everyone consistent, we need to build it on \textit{Total-Ordered Broadcast}. Because we have state machines, the order of processing matters, therefore we need to be able to have all the machines process things in the same order.
+            These can be 
+            \begin{itemize}
+                \item Synchronous TOB
+                \item Async TOB
+                \item Eventually synchronous broadcast
+            \end{itemize}
+    \end{frame}
+    \subsection{Synchronous implementation}
+        \begin{frame}
+            \frametitle{Synchronous Implementation of TOB}
+                \begin{itemize}
+                    \item On x at $S_i$, flood it 
+                    \item All servers $S_i$ keep $UnQueued_i$ of received messages. These could be received in arbitrary order
+                    \item All servers $S_i$ keep a set $Queued_i$. When they move messages from $UnQueued$ to $Queued$, they do so in the same order
+                    \item There is a leader $L$ (sequencer), who makes the order. Corrupted leader may break liveness but not safety
+                    \item If a message is put into $Queued$, they do it in the same order. Leadership goes round-robin. This guarantees liveness
+                    \item This happens with blocks
+                \end{itemize}
+        \end{frame}
+
+    \subsection{Async implementation}
+        \subsubsection{Enten den her}
+            \begin{frame}
+                \frametitle{Adapting IF to Async broadcast}
+                    Now we have a notion of an epoch, $Unqueued$ and we transmit multiple inputs in combined blocks. 
+                    \begin{enumerate}
+                        \item On input x to TOB, add it to $Unqueued$
+                        \item Leader of epoch is $P_i \mod n$ 
+                        \item Leader adds $Unqueued$ to block and broadcasts it
+                        \item When receiving block, add it to $Q$
+                    \end{enumerate}
+            \end{frame}
+        \subsubsection{Eller den her}
+            \begin{frame}
+                \frametitle{Core-set selection: EKSTRA STUFF DER KAN SPRINGES OVER?}
+                    We cannot reliably wait for the leader in each epoch. So we have everyone propose a block, and when a block is \textit{seen by many honest}, we can trust it. We simply have everyone collect these blocks and take the union of them. We have Byzantine Agreement available to us in the async model. 
+            \end{frame}
+            \begin{frame}
+                \frametitle{Tidsmæssigt problematisk: Core-set selection}
+                    Per fig. 11.4
+                
+            \end{frame}
+
+%===================================
+\section{Client-centric consistency}
+    \begin{frame}
+        \frametitle{Client vs. Server side consistency}
+        \textbf{Server-side}, which is all honest servers executing commands in the same order
+        
+        \textbf{Client-side}, which is servers being behind other servers. This is why agree requires that for honest servers, that their output is a prefix of another honest parties output
+    \end{frame}
 
 
 
