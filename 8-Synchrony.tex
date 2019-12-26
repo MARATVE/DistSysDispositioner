@@ -16,6 +16,7 @@
 % \setbeamertemplate{footline}
 \setbeamertemplate{headline}
 
+\newcommand{\N}{\mathbb{N}}
 % style for source code
 \usepackage{listings}
 \newcommand{\Hilight}{\makebox[0pt][l]{\color{light-gray}\rule[-4pt]{1.0\linewidth}{12pt}}}
@@ -48,10 +49,122 @@
 
 \frame{\frametitle{Table of contents}\tableofcontents} 
 
+% What is the synchronous model about?
+    % Clocks, known drift, known delivery times
+
+% Physical Time
+
+% Clock Synchronisation
+    % GPS, NTP
+
+% The Round-Based Protocols
+    % What and how
+
 
 %===================================
+\section{Synchronous Model}
+        \begin{frame}
+            \frametitle{First slide}
+                \begin{itemize}
+                    \item Clocks
+                    \item Known drift
+                    \item delivery times
+                \end{itemize}    
+        
+        \end{frame}
+%===================================
+\section{Physical Time}
+        \begin{frame}
+            \frametitle{Physical Time}   
+            Computers need access to physical time. Most consumer grade computers have quartz crystal clocks. These drift by about 1 second every 10 days. They drift $2^{-20}$ seconds per second. A modern CPU can execute $1000$ instructions in that time. It is therefore a long time. There are also atomic clocks, that lose 1 second per 1 million years. 
+        \end{frame}
+%===================================
+\section{Clock synchronisation}
+        \begin{frame}
+            \frametitle{GPS Synchronisation}
+                Global Positioning System has large number of satellites in low orbit with atomic clocks. They transmit their position and time. Position is $(x, y, z)$ giving 4-dimensions $(x, y, z, t)$. If you receive 4 signals, then you get 4 equations with 4 unknowns, and thus you can compute your own position. 
+        \end{frame}
+        \begin{frame}
+            \frametitle{NTP Clock Synchronisation}
+                NTP stands for \textit{Network Time Protocol}. Let $S$ be a server with an atomic clock or something close to it. Let $C$ be a client with a drifting clock. We have the following two assumptions:
+                \begin{itemize}
+                    \item During the running of the protocol, the drift is negligible
+                    \item The time it takes to send from the client is the same as from the server to the client
+                \end{itemize}
+                If the entire protocol takes a second, and the client has a quartz clock, it might only drift by $2^{-20}$ seconds which is fair. 
+        \end{frame}
 
+        \begin{frame}
+            \frametitle{NTP Protocol}
+                \begin{itemize}
+                    \item $C$ sends "time request" message to $S$ and stores its current system time $T_1$
+                    \item Upon receiving the "time request" message, the server $S$ stores its current system time $T_2$
+                    \item The server $S$ prepares a "time response" message, which includes the time $T_2$. Right before the response to the client $C$, it computes $T_3$ and sends it all. 
+                    \item Upon receiving $T_2, T_3$, the client $C$ measures current system time $T_4$. 
+                    \item Compute $TransEst = \frac{(T_4 - T_1) - (T_3 - T_2)}{2}$
+                    \item Compute $OffsetEst = (T_1 + TransEst) - T_2$             
+                \end{itemize}
+        \end{frame}
+        \begin{frame}
+            \frametitle{NTP Protocol: Why does it work?}
+                The clock of the client initially is $Offset = T_C - T_S$ ahead. Now $T_S = T_C - Offset$. Let $Trans$ be the transport time. Then, when server measures $T_2$, the clients time is $T_1 + Trans$. The time at the client is $T_1 + Trans$. Offset could then be $Offset = (T_1 + Trans) - T_2$. Transmission time cannot be computed accurately, because they the two clocks are not synchronised. The way to fix this, realise that $T_4 - T_1$ is the total time it took to run the protocol. $T_1, T_4$ are run on the same clock, so this is fine. Time spent on server side $T_3 - T_2$ is also well defined. Therefore, the total time spent sending both messages is $(T_4 - T_1) - (T_3 - T_2)$. The clocks don't drift noticably, and the time it takes to send is the same, divide this by $2$ to get an estimate of $Trans$, and thus $Offset$. 
+        \end{frame}
+        \begin{frame}
+            \frametitle{Adjusting the Clock and assumptions}
+                 Instead of jumping backwards and forwards, which can disturb processes, we instead speed the time up or slow it down in order to 
+                 peacefully synchronise the time. 
 
+                 The assumption of transfer times is optimistic, since there many be many variations in network transfer times. This is why the NTP protocol runs several times and adopts the one where the transfer estimate is lowest, because the ones that have the highest transfer time may also be the ones where errors occur (???)
+
+                 If one knows the bound on network delay, and how much clocks can drift, it is possible to compute the \textit{Max Clock Drift} when occasionally running NTP.
+        \end{frame}
+%===================================
+\section{Round-based protocol}
+        \begin{frame}
+            \frametitle{The fully synchronous Round-based protocols}
+                For the fully synchronous Round-based model to work, consider $n$ parties or processes $P_1, ..., P_n$. The protocol, $\pi$, proceds in \textit{rounds}. In each round, one can send a message or NoMsg. Assume that all parties have perfectly synchronised clocks, messages arrive in the following round and that transmission time is fixed. 
+        \end{frame}
+        \begin{frame}
+            \frametitle{Message arrival}
+                The assumptions are not entirely realistic, but we can still hope to set bounds on drift and delivery times. If party knows that someone will send a message at time $t$. If it knows $Offset, Trans$. If it receives nothing at $t + 2Offset + Trans$ then it knows that nothing was sent. At real time, $(t + Offset + Bound) + Offset = t + 2Offset + Trans$
+        \end{frame}
+        \begin{frame}
+            \frametitle{Accounting for Computation Time}
+                We can now set timeouts so that we do not drop messages that arrive too late. Let $MaxComp$ be the maximum time it takes for any party to complete the necessary computation. We also assume a positive bound on $MaxTrans$ and one on $MaxDrift$, which can be kept down with clock synchronisation. Let now $SlotLength = 2MaxDrift + MaxTrans + Maxcomp$. 
+                
+                This ensures that all honest parties have time to compute and send messaes. 
+
+                Let $t_0$ be the time everyone agreed to start the protocol. The input to $P_i$ is $(t_0, x_i)$. All honest parties agree on $t_0$. We assume that this arrives at $t_0$. 
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{The rounds}
+                Each round runs within a time slot. Rounds are indexed by $r \in \N$. Round $r$ begins at (local) time $SlotBegin^r = t_0 + r \cdot SlotLength$. Let $Compute$ be the alorithm that does the computation performed by $P_i$. It takes $r$ as input. It outputs the message to be sent, and also outputs to itself. It can be used to store the local store of parties, or values it needs to remember. 
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Generic round-based protocol: Probably extra fluff?}
+                \begin{enumerate}
+                    \item Each $P_i$ gets $(t_0, x_i)$ before $t_0$ and computes $SlotBegin^r$ for $r = 0, 1...$
+                    \item At time $SlotBegin^0$ party $P_i$ computes $(m_{i, 1}^0, ...m_{i, n}^0, state_{i, 0}) = Compute(0, x_i)$. Local time is 
+                    now at most $SlotBegin^0 + MaxComp$
+                    \item Send $(MSG, 0, m_{i, j}^0)$ to each $P_j$. This arrives at local time at most $SlotBegin^0 + MaxComp + 2MaxDrift + MaxTrans$ at $P_j$. And $SlotBegin^0 + MaxComp + 2MaxDrift + MaxTrans \leq slotBegin^1$
+                    \item In rounds $r = 1, 2, ..$ $P_i$ runs as follows:
+                \end{enumerate}
+        \end{frame}
+        \begin{frame}
+            \frametitle{Generic Round-based Protocol: Probably extra fluff?}
+                \begin{enumerate}
+                    \item Receive and store messages until $SlotBegin^r$
+                    \item At $SlotBegin^r$, for each $P_j$, if no message is stored, let it be $NoMsg$. Compute $Compute(M_{i, i}^{r-1}, ..., m_{n, i}^{r - 1})$ 
+                    \item Send $(MSG, r, m_{i, j}^r)$ to each $P_j$. This arrives at most $SlotBegin^{r-1} + MaxComp + 2MaxDrift + MaxTrans$ at $P_j$. And $SlotBegin^{r-1} + MaxComp + 2MaxDrift + MaxTrans \leq SlotBegin^r$
+                \end{enumerate}
+        \end{frame}
+
+    \begin{frame}
+        \frametitle{Speed of clock based protocols}
+            In fully synchronous systems, each round takes the worst-case time to send messages, which can be devastating. 
+    \end{frame}        
 
 \end{document}
 
