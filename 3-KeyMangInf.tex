@@ -1,40 +1,4 @@
-\documentclass[14pt]{beamer}
-% \useoutertheme{miniframes}
-
-\usepackage{ngerman}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{textcomp}
-% \usepackage{amsmath,amsfonts,amssymb}
-\usepackage{url}
-
-% disable Navigation at the bottom
-\beamertemplatenavigationsymbolsempty
-
-% page numbers
-% \setbeamertemplate{footline}[frame number]
-% \setbeamertemplate{footline}
-\setbeamertemplate{headline}
-
-% style for source code
-\usepackage{listings}
-\newcommand{\Hilight}{\makebox[0pt][l]{\color{light-gray}\rule[-4pt]{1.0\linewidth}{12pt}}}
-\usepackage[framed,numbered]{mcode}
-\usepackage{color}
-\definecolor{light-gray}{gray}{0.80}
-  
-% use {\mono lorem} to set something in monospace
-\newcommand{\mono}[1]{\ttfamily\fontsize{14}{14}\selectfont #1}
-
-% wanna use Metapost?
-\makeatletter
-\newcommand\@ptsize{12}
-\makeatother
-
-\usepackage{mflogo}
-\usepackage{emp}
-\DeclareGraphicsRule{*}{mps}{*}{}
-
+\input{include/preamble.tex}
 
 \title{3- Key Management and Infrastructure}   
 \author{Mathias Ravn Tversted} 
