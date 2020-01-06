@@ -1,5 +1,6 @@
 \documentclass[12pt]{beamer}
 \usetheme{metropolis}           % Use metropolis theme
+\metroset{titleformat=smallcaps}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -11,8 +12,9 @@
 \beamertemplatenavigationsymbolsempty
 
 % Cool font
-\usepackage[defaultsans]{droidsans}
-
+\usepackage{FiraSans}
+% \usepackage[sfdefault,light]{FiraSans}
+% \usepackage{newtxsf}
 
 % page numbers
 % \setbeamertemplate{footline}[frame number]
@@ -22,7 +24,6 @@
 % style for source code
 \usepackage{listings}
 \newcommand{\Hilight}{\makebox[0pt][l]{\color{light-gray}\rule[-4pt]{1.0\linewidth}{12pt}}}
-\usepackage[framed,numbered]{mcode}
 \usepackage{color}
 \definecolor{light-gray}{gray}{0.80}
   
