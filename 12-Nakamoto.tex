@@ -14,7 +14,124 @@
 
 %===================================
 
+% Nakamoto Style Consensus
+    % What and why?
 
+%  Distributed Lottieres
+    % Proof of work
+    % OR
+    % Proof of stake
+
+% Growing a Tree
+    % Blocks, Lottery winners, Tree, Best Path
+
+% Properties
+    % Treee growth
+    % Chain quality
+    % Limited rollback
+
+
+\section{Nakamoto Style Consensus}
+    \begin{frame}
+        \frametitle{Nakamoto Style Consensus}
+           \begin{itemize}
+              \item Uses Totally-ordered broadcast with Lotteries
+              \item Canbe considered a kind of synchronous protocol
+           \end{itemize} 
+           It should have the following properties:
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Properties of Nakamoto Style Consensus}
+            \begin{itemize}
+                \item \textbf{Autonomy}: System should not be controllable by single entity. Should not have \textit{single point of attack}. Anyone should be able to join and leave, and the system should not be impacted.
+                \item \textbf{Self-incentivization}: Running servers and maintaining the system costs money. The system should incentivise people to run and maintain 
+                the system. If the currency is secure and valuable, it will incentivise people into running the system.
+                \item \textbf{Peer-To-Peer Friendly}: Peer to peer networks are autonomous and unpermissioned. These are ideal implementing the blockchain. Communication is done by flooding messages to neighbours. 
+                \item \textbf{Denial of service attack resistant}: Peer-to-peer networks are open, so peers cannot hide behind firewalls. Individual peers are vulnerable to denial of service attacks. Instead of everyones IP being known, peers simply know their neighbours and flood messages. This means that denial of service attacks on individual peers do not impact the stability of the system
+            \end{itemize}
+    \end{frame}
+        \begin{frame}
+            \frametitle{Three Components:}
+                Nakamoto Style Consensus has 3 components: 
+                \begin{itemize}
+                    \item Distributed Lottery
+                    \item Tree of Blocks
+                    \item Longest Chain Rule
+                \end{itemize}
+        \end{frame}
+
+\section{Distributed Lotteries}
+        \begin{frame}
+            \frametitle{Distributed Lottery}
+                The lottery is a distributed leader election. Synchronous TOB has a leader in each round sending out a new block. Round robin does not work in systems like blockchains. 
+                
+                \textbf{Local computation only}: participants only need to know the current state of TOB to participate. They can participate without communicating with others. There can be multiple winners or even no winners.
+            
+                \textbf{Non-predictability}: No one should be able to predict \textit{who} wins, or they could be a target of a ddos attack for example.
+
+                \textbf{Public Verifiability}: Once you won, the peers should be able to verifiy that this is true
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{Distributed Lottery}
+                \textbf{One message}: When you win, you should only send one message along with the next block. Proof should be associated with the block, so that it cannot be misused Verification key is embedded into the block. 
+                
+                \textbf{Sybil Attack Resistant}: It should cost something to enter the lottery, so that an adversary cannot enter enough to be extremely likely to enter
+        
+                There are two different ways of deciding winners generally speaking. They are \textit{Proof of work} and \textit{Proof of stake}. 
+
+        \end{frame}
+    \subsection{Proof of work}
+    \begin{frame}
+        \frametitle{Proof of work}
+        Proof of work allows people to do computation in order to get tickets for the lottery.
+            \begin{itemize}
+                \item  Let A be last block, H a hash function, then $a = H(A)$ be the block we want to extend. $a$ is a pointer to A.
+                \item To win the right to extend the chain at A, compute $y_c = H(a, vk, c)$ for Verification key $vk$.
+                \item $c$ is a counter. Using SHA256, this gives 256-bit $y_1$. 
+                \item Good hash functions behave like "random" functions, therefore $y_1$ can determine if $vk$ won the lottery. 
+            \end{itemize}         
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Proof of work}
+            \begin{itemize}
+                \item Hardness level $h$. If first $h$ bits are $0$, you win. If $y_c$ is random, then probability is $2^{-h}$ 
+                \item Giving each vk one try to compute $y_1$ is not sybil resistant. 
+                \item Set hardness higher, such as $30$ and let everyone go nuts. This prevents Sybil attacks
+            \end{itemize}
+            Proof of work is environmentally problematic, because it uses an enourmous amount of power. 
+    \end{frame}
+
+    \subsection{Proof of stake}
+        \begin{frame}
+            \frametitle{Proof of stake}
+                Proof if stake is more energy efficient. Here the amount of currency determines how likely you are to win. The idea is that if you have a stake in the system, you are much more likely to be honest. 
+                \begin{itemize}
+                   \item Each account $vk$ has a stake $a$, which could the amount of cryptucurrency. 
+                   \item All parties agree on when slots will be run. To check if $vk$ won the lottery, it computes $Draw = Sig_{sk}(LOTTERY, slot)$. Where LOTTERY is the string "lottery"
+                   \item Value of the draw $Val = a \cdot H(Draw)$ where $H(Draw)$ is a random value. If $Val \geq Hardness$, congratulations you win the lottery. 
+                   \item Send along $Sig_{sk}(B)$ so that the draw is bound to the block. Others can now verify that you won the lottery.  
+                \end{itemize}
+        
+        \end{frame}
+
+\section{Tree of Blocks and longest chain rule}
+        \begin{frame}
+            \frametitle{Tree of blocks}
+                When the leader sends out a new block. It contains a proof that it won the lottery, along with what it thinks is the previous block. This creates a chain of blocks, but when several people win the lottery, this creates a tree.         
+        \end{frame}
+        \begin{frame}
+            \frametitle{Longest Chain Rule}
+                In order to fix the tree property, we simply choose to extend the longest chain and call that the blockchain. In case of ties, we apply a deterministic tie breaking heuristic. 
+
+        \end{frame}
+    \subsection{Blocks}
+    \subsection{Lottery winners}
+    \subsection{Best path}
+
+\section{Properties}
 
 \end{document}
 
