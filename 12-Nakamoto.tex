@@ -120,16 +120,22 @@
 \section{Tree of Blocks and longest chain rule}
         \begin{frame}
             \frametitle{Tree of blocks}
-                When the leader sends out a new block. It contains a proof that it won the lottery, along with what it thinks is the previous block. This creates a chain of blocks, but when several people win the lottery, this creates a tree.         
+                When the leader sends out a new block. It contains a proof that it won the lottery, along with what it thinks is the previous block. This creates a chain of blocks, but when several people win the lottery, this creates a tree. This is fixed by the \textit{longest chain rule}, where the longest chain available is extended. Where there is a tie, a deterministic heuristic is used. 
         \end{frame}
         \begin{frame}
-            \frametitle{Longest Chain Rule}
-                In order to fix the tree property, we simply choose to extend the longest chain and call that the blockchain. In case of ties, we apply a deterministic tie breaking heuristic. 
-
+            \frametitle{Properties of the blockchain}
+                Because a rollback of a branch is possible, a transaction cannot be considered final until it is no longer able to be rolled back. We now introduce the following
+                \begin{itemize}
+                   \item \textbf{Super block}: A super block is a block produced by an honest party which won a timely lottery with no other winner. This can not result in branching, so they sit at different heights in an honest tree.  
+                \end{itemize}
+            
+        
         \end{frame}
-    \subsection{Blocks}
-    \subsection{Lottery winners}
-    \subsection{Best path}
+
+
+    %\subsection{Blocks}
+    %\subsection{Lottery winners}
+    %\subsection{Best path}
 
 \section{Properties}
 

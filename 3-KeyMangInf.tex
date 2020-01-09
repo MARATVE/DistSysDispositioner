@@ -4,6 +4,11 @@
 \author{Mathias Ravn Tversted} 
 \date{\today} 
 
+\begin{document}
+
+\frame{\titlepage} 
+
+\frame{\frametitle{Table of contents}\tableofcontents} 
 % Why do we not use the same key all the time
 
 % Key distribution centers
@@ -33,7 +38,32 @@
 
 
 %===================================
-\begin{document}
+
+	\begin{frame}
+		\frametitle{Disposition}
+			\begin{itemize}
+				\item Why do we use session keys
+				\item Key distribution centers
+				\item Certification authorities
+				\item Certificate chains
+				\item Identifying users
+				\item Password attacks
+				\item Hardware and biometrics
+			\end{itemize}
+	\end{frame}
+
+
+	\section{Session keys}
+		\begin{frame}
+			\frametitle{Two-party communication: Session keys}
+				\begin{itemize}
+					\item If we use the same key for all communication, an adversary has more data to work on. 
+					\item We have \textit{long-term keys} $K_{AB}$ between A, B. Then we generate a session key $E_{K_{AB}}(K)$ and use that. 
+					\item By switching keys here and there, we only use keys on a limited amount of data.  	
+					\item However having everyone's keys grows quadratically with number of users. How to fix this?
+				\end{itemize}
+		\end{frame}	
+
 	\section{Key Distribution Centers}
 		\frame{\frametitle{Key Distribution Problems}
 			Public key cryptography depends on the distribution of keys. Everyone having to store everyone else's keys scales badly. One way to solve this problem is by having centralised databases of keys. These are called \textit{Key Distribution Centers} or (KDC). 
@@ -57,8 +87,13 @@
 					\item Key $K_{AB}$ is replaced by pair $(sk_B, pk_B)$. Here $pk_B$ is public. 
 					\item A sends session key $E_{pk_B}(K)$ to B. 
 				\end{itemize}
-				How do we distribute these? Assume we have a \textit{Certification Authority} CA with the pair $(sk_{CA}, pk_{CA})$. Everyone then gets a copy of $pk_{CA}$. Then begins the hard part of authenticating yourself with the CA. This might even be done in person. The CA then issues cert $ID_A$, and $pk_A$ and then the signature $S_{sk_{CA}}(ID_A, pk_A)$. Now everyone can check to see if the public key is legitimate. 
+				How do we distribute these? We have a \textit{Certification Authority}. Each person has authentic copy of $pk_{CA}$ and then everyone authenticates themselves with the CA giving them their key (this might have to be without cryptography, such as offline methods). CA then signs $S_{sk_{CA}}(ID_A, pk_A)$, that is, signs the ID of A, as well as their public key. Everyone can now check that A's public key is legitimate.
 			}
+
+			\begin{frame}
+				\frametitle{Authenticating yourself with the CA}
+					We cannot just rely on network communications to authenticate users with a CA. \textit{Any secure system using cryptography must make use of one or more keys that are protected by physical, non-cryptographic means}. 
+			\end{frame}
 
 			\frame{\frametitle{Certificate Chains: Or Who Verifies The Verifiers}
 				If two people do not have certificates issued from the same CA, they can use what's called Certificate Chains to solve this problem. If CA's certifiy each other's public keys. 
@@ -70,12 +105,24 @@
 			}
 
 		\section{How to identify users}
+				\begin{frame}
+					\frametitle{How to identify users}
+						There are a number of ways to identify users:
+						\begin{itemize}
+							\item Something you know (passwords)
+							\item Something you have (hardware tokens)
+							\item Something you are (biometrics)
+						\end{itemize}
+				\end{frame}
+
 				\frame{\frametitle{Who they are? Biometric Security}
 					Biometric Security is when a system makes use of fingerprints, voice, facial recognition and other biological factors unique to an individual to identify them. This has a privacy downsides, and if the information is leaked, it could still be used to attack systems. 
 				}
 
 				\frame{\frametitle{Something They Have: Hardware Security}
 					Hardware may have their own keys, such as for RSA encryption, which is only accessible through the CPU. It is also possible to make \textit{tamper evident} hardware, which can tell if it has been tampered with. 
+					
+					
 					\textbf{Two-factor authentication}: Two-factor authentication works by demanding that the user authenticate themselves not only with a password, but also by possession of a piece of hardware, such as a smartphone. This means that even if the password is compromised, it is still possible to deny intruders access. 
 				}
 
@@ -90,14 +137,26 @@
 			}
 
 			\frame{\frametitle{Password security}
-				The previously listed problems can be remedied with the following:
 				\textbf{Guessing passwords}: This can be remedied with password rules. However, the more password rules, the fewer combinations people have to guess. Having ample length and characters (but mostly length) and a database of vulnerable passwords that are forbidden seems to be the best policy
-				\textbf{Insecure Transmission}: Use encryption
+
+
+				\textbf{Insecure Transmission}: Use encryption when communicating over the internet. Without encryption, using a password becomes useless. 
+
+
 				\textbf{Insecure storage by the user}: Could be helped by using other forms of authentication, such as two-factor authentication.  
+
+
 				\textbf{Stealing from verifier}: Salt and hash passwords, store them encrypted and use good security policies.  
 			}
 
+				\begin{frame}
+					\frametitle{Password Security}
+						Number of possible passwords is $C^{l}$ where $l$ is the length and $C$ the character set. It is therefore better to choose longer passwords. 
 
+						Restrictive rules are bad, because they reduce the character set. Password rotation rules make people use predictable passwords.
+
+						Passphrases are easier to remember and are usually longer.
+				\end{frame}
 
 
 \end{document}
