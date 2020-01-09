@@ -36,6 +36,7 @@
                 \item \textbf{S}poofing Identity
                 \item \textbf{T}ampering data without being detected
                 \item \textbf{R}epudiation. Attackers are able to deny their actions
+                \item \textbf{I}nformation Disclosure, the attacker accessing data
                 \item \textbf{D}enial of service
                 \item \textbf{E}levation of privilege
             \end{itemize}
@@ -99,7 +100,7 @@ void foo(char* input) {
     \begin{frame}
         \frametitle{Overflow Attacks}
                 WHAT KIND OF ATTACK MODEL DO WE USE HERE? RELATE TO TAXONOMY
-            Since strings in C are 0-terminated, it will continue to copy until it sees the 0. This means that it will write out of bounds of the buffer, and perhaps even into the previous stack frame. This could impact things such as the base pointer and stack pointers or other variables, which are now under the control of the adversary.
+            Since strings in C are null-terminated, it will continue to copy until it sees the null char. This means that it will write out of bounds of the buffer, and perhaps even into the previous stack frame. This could impact things such as the base pointer and stack pointers or other variables, which are now under the control of the adversary.
     \end{frame}
 
     \subsection{Unicode Exploits - SKAL FIXES}
