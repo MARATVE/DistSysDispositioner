@@ -56,6 +56,9 @@
                 \item \textbf{I}nsiders, who are registered and legal users of the system
             \end{itemize}
             Then \textit{where} the attacks come from. 
+    \end{frame}
+    \begin{frame}
+        \frametitle{Where are we attacked, and by whom: EINOO}
             \begin{itemize}
                 \item \textbf{N}etwork attacks. The adversary can listen and modify network traffic. This is described in part in X.800
                 \item \textbf{O}ffline attacks. The adversary gets access to disks or other hardware, perhaps even stealing payroll information of a hard disk (like what happened to Facebook). These are harder to defend yourself against
@@ -109,8 +112,14 @@ void foo(char* input) {
                 WHAT KIND OF ATTACK MODEL DO WE USE HERE? RELATE TO TAXONOMY
                 When trying to access directories on a web server, a user may send an URL or some other string that defines what resource a client is trying to gain access to. An example of this going wrong was the IIS (Microsoft internet server, such as for ASP.NET) checking these requests. 
                 FRA BOGEN:
-                "At the same time, requests are allowed to contain unicode characters which is a way to encode special characters like ø, å using only the “normal” character set. This allows directory names to contain all kinds of international characters. These characters must be decoded before taking action. Unfortunately, the IIS (or at least a previous version of it) does the security check of the requests before the decoding, or at least before all decoding steps are completed, so this allows an attacker to mask an offending request by encoding it in unicode in a special way so it takes a form that the security check will not recognize. The attack therefore consists of sending such a carefully masked request to the IIS, a request that will execute, e.g., a command shell. This will (or at least previously it would) run with the same access rights as the IIS, so the attacker can now upload and run various interesting software to the target computer.
-                The details of how a request was actually masked in order to fool the security check can be found in the text by McClure et al. mentioned below."
+                "At the same time, requests are allowed to contain unicode characters which is a way to encode special characters like ø, å using only the “normal” character set. This allows directory names to contain all kinds of international characters. These characters must be decoded before taking action.
+        \end{frame}
+
+        \begin{frame}
+            \frametitle{The Unicode Exploit}
+            Unfortunately, the IIS (or at least a previous version of it) does the security check of the requests before the decoding, or at least before all decoding steps are completed, so this allows an attacker to mask an offending request by encoding it in unicode in a special way so it takes a form that the security check will not recognize. The attack therefore consists of sending such a carefully masked request to the IIS, a request that will execute, e.g., a command shell. This will (or at least previously it would) run with the same access rights as the IIS, so the attacker can now upload and run various interesting software to the target computer.
+            The details of how a request was actually masked in order to fool the security check can be found in the text by McClure et al. mentioned below."
+        
         \end{frame}
 \subsection{Cross-site scripting}
         \begin{frame}
@@ -145,6 +154,11 @@ void foo(char* input) {
                     \item Have box create single length DES key $K_0$ and compute it using exhaustive search. Have it encrypt some known text. This is possible because it is a 56-bit key
                     \item Ask it to form double length \textit{key encryption key} $K_2$ with \textit{replicated halves}. This is allowed because $K_0$ is a single length key so it is not stronger than $K_2$
                     \item The above step produced $E_{K_2}(K_0)$. We can now find $K_2$ with exhaustive search as above. Since $K_2$ is a \textit{key encryption key}, that means it can be used for exporting keys. 
+                \end{itemize}
+        \end{frame}
+        \begin{frame}
+            \frametitle{IBM 4758: The Attack}
+                \begin{itemize}
                     \item Manually type in a \textit{non-replicated} key part of $K_1$, pretending you are transporting a key
                     \item Call \textit{Combine Key parts} to make $K = K_1 \bigoplus K_2$
                     \item $K_1$ is not replicated and neither is $K$, so it will be classified as a full strength \textit{key encryption key}. It is not a key part from a single user. You can therefore export under $K$ all the keys you want, but the attacker knows $K$.
@@ -166,7 +180,7 @@ void foo(char* input) {
                 \item Compute next state $s_{i + 1} = p^{s_i} \mod n$
                 \item Compute output $r_i = Q^{s_i} \mod n$
             \end{itemize}
-            If $P, Q$ are random, it is hard to break to break the PRG. However, if they are hardwired (like a NIST standard), then it is possible to break it
+            If $P, Q$ are hardwired (like NIST standard). It can be broken
             \begin{itemize}
                 \item Adversary chooses random $Q$ and $x$. Then computes $P = Q^x \mod n$. Adversary gives user $P, Q$ to the user and keeps $x$
                 \item Adversary observes $r_i$ from PRG, advresary computes $s_{i + 1} = (r_i)^x \mod n$, and can compute all future outputs because $s_{i + 1} = (Q^x \mod n)^{s_i} \mod n$ and $r_i = Q^{s_i} \mod n$, and so $s_{i + 1} = (r_i)^x \mod n$.  
@@ -197,6 +211,9 @@ y = array2[array1[x] * 4096]
            \item x and array1 are in cache, but array2 and array1\_size are not (array1 size is a variable)
            \item Adversary can control cache by using some variables more than others
         \end{itemize}
+\end{frame}
+\begin{frame}
+    \frametitle{SPECTRE}
         Attacker can now execute with a value of x that is too large, and array1[x] can now be almost whatever they want of the process memory. CPU will now fetch array1\_size and execute the body. $\text{array1}[x] \cdot 4096$ can be evaluated quickly since it is in cache, so CPU will fetch $array2[array1[x] \cdot 4096]$ to cache, and while it is on the way, CPU realises it is wrong and rolls back, but it is still in cache, while no other element of array2 is. If the attacker can work out what element from array2 is in cache, it will reveal array1[x]. Load every element from array2 into a register one after the other and measure the time it takes. 
 \end{frame}
  
