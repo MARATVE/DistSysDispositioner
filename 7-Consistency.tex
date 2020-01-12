@@ -33,7 +33,7 @@
 %===================================
 \section{Unstructured Peer to Peer}
     \begin{frame}
-        \frametitle{Floodin Network}
+        \frametitle{Flooding Network}
             A flooding network is a network where messages are flooded. This guarantees that if a message is sent, it will eventually be delivered to all correct processes. When receiving a new message, it is simply sent to all other peers. This means that we cannot guarantee total ordering since messages can overtake each other. 
     \end{frame}
     \begin{frame}
@@ -79,6 +79,11 @@
             \begin{itemize}
                 \item When $P_i$ sends message $m$ it increments $VectorClock(P_i)[P_i]$ by one
                 \item When $P_i$ sends message $m$ it sends along $VectorClock(P_i)$. When $P_i$ sends $m$ that message can be influenced by exactly the messages that have influenced $P_i$ at the time $P_i$ sends a message. 
+            \end{itemize}
+    \end{frame}
+    \begin{frame}
+        \frametitle{Vector Clocks}
+            \begin{itemize}
                 \item By sending the vector clock with the message, you can determine which messages could have influenced $m$
                 \item Formally: $s = VectorClock(P_i, m)[P_j]$ messages from $P_j$ could have influenced $m$
             \end{itemize}
@@ -93,13 +98,48 @@
     \end{frame}
 
     \begin{frame}
-        \frametitle{Causal-Past Relation - MISSING}
-                
+        \frametitle{Causal-Past Relation}
+            There is a notion that certain messages could have \textit{caused} other messages. Or "the happens-before relation". 
+
+            \textbf{Kasusel-past relation}: $(P_i, m_i) \hookrightarrow (P_j, m_j)$
         
-    
+            If there is a chance that $m_j$ depends on $m_i$, then we treat it as if that is the case. 
+
+            Denote $CasualPast(P_j, m) = \{(P_i, m_i) | (P_i, m_i) \hookrightarrow (P_j, m_j) \}$ the set of things that may depend on $(P_i, m_i)$. 
+
+            We can similarly define a \textit{Kausual Future}. 
     \end{frame}
+
+    \begin{frame}
+        \frametitle{C-ass-ual network: In Practice}
+            \begin{itemize}
+                \item \textbf{Ports}: It connects $n$ parties. For each party there is a port $Casuel_i$. It has ports leak and deliver
+                \item \textbf{Init}: $\forall P_i$ keep $Delivered_i = Sent = \emptyset$
+                \item \textbf{Send}: On input $(P_i, m)$ on $Kasusel_i$. $Sent = Sent \cup (P_i, m)$. $KasuselPast(P_i, m) = CasualPast(P_i) \cup (P_i, m)$
+                \item On $(P_j, P_i, m)$ where $(P_j, m) \in Sent$ but not Delivered. If $KasuselPast(P_j, m) \subset Delivered_i \cup (P_j, m)$ then deliver it and update Kasualpast. 
+            \end{itemize}
+    \end{frame}
+
 %===================================
-\section{Total order - MISSING}
+\section{Total order}
+    \begin{frame}
+        \frametitle{Total Order}
+            \textbf{Total Order}: If correct $P_k$ delivered $(P_i, m)$ and laterdelivered $(P_j, m')$. Then it holds for all $P_m$ that if they deliver $(P_j, m')$ they delivered $(P_i, m)$ earlier. 
+        
+            We can implement this using Kasusel ordering and Vector Clocks. 
+    \end{frame}
+
+        \begin{frame}
+            \frametitle{TOB from Casuselss and shizzle}
+                \begin{itemize}
+                    \item \textbf{Init}: For each $P_i$ it keeps $InTransist = UnOrdered \emptyset$
+                    \item \textbf{Send}: On input $(P_i, m)$ on $Flood_i$ output $(P_i, m)$ and add $(P_i, m) \rightarrow Unordered$
+                    \item \textbf{Order}: On input $(P_i, m)$ on Order, if $(P_i, m) \in Unordered$ then pop and add it to the queue $InTransit_j$
+                    \item \textbf{Deliver}: On input $P_i$ on Deliver, pop $InTransit$ and output it.   
+                \end{itemize}
+            
+        
+        \end{frame}
 
 \end{document}
 

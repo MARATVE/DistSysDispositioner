@@ -37,7 +37,7 @@
             With synchronous broadcast, we are trying to solve an agreement problem. We are looking for the following properties
             \begin{itemize}
                 \item \textbf{Agreement}: All honest parties make the same decision
-                \item \textbf{Validity}: The decision must be sensible in some sensible
+                \item \textbf{Validity}: The decision must be sensible in some sense
                 \item \textbf{Termination}: If all parties start running the protocol, then all honest parties must end up with some decision
             \end{itemize}
     \end{frame}
@@ -113,7 +113,7 @@
                 \begin{itemize}
                     \item \textbf{Signed}: If $|HasSeen| \geq n-t$ then add it to $SignedBy$
                     \item \textbf{Transfer I}: If $SignedBy(P_i, m) = \top$ then send $(Transfer, P_i, m)$ to everyone
-                    % \item \textbf{Transfer II}: If you get a transfer where the original sender has signed it, send $(P_i, m)$
+                    \item \textbf{Transfer II}: If you get a transfer where the original sender has signed it, send $(P_i, m)$
                 \end{itemize}
             
         
@@ -122,9 +122,10 @@
 %===================================
 
 \section{Lower-Bound on broadcast}
-
-
-
+        \begin{frame}
+            \frametitle{Lower-Bound on Broadcast}
+                Not Implemented. Go with EMOSIG Broddah
+        \end{frame}
 
 \end{document}
 
