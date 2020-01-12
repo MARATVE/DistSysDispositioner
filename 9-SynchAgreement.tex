@@ -57,10 +57,67 @@
 %===================================
 
 \section{Dolev-Strong protocol}
+    \begin{frame}
+        \frametitle{Dolev-Strong}
+            The Dolev-Strong is essentially just a normal round-based protocol with signatures, but with a twist: A party will only accept a forwarded message if it has been signed by the person sending it. It requires a new signature for every round. 
+    \end{frame}
 
+    \begin{frame}
+        \frametitle{Dolev-Strong Protocol: This Time It's Protocol}
+            \begin{itemize}
+               \item \textbf{Initialise}: Activate ToyPKI and learn people's public keys. Init $Relayed(bid, m) = \emptyset$
+               \item \textbf{Broadcast}: On $Input(bid, P_i, m)$. Set $Relayed(bid, m) = \top$. Compute and add signature and send $(bid, P_i, m, sigset)$
+               \item \textbf{Relay}: On input $(bid, P_i, ?)$ in round $r$, if not relayed, then verify signatures ($r-1$ signatures in round $r$). One of these has to be from the original sender. Add own signature, set $Relayed(bid, m) = \top$ and broadcast
+               \item \textbf{Output}: In round $n+2$, if there is only one message such that $Relayed(bid, m) = \top$ then output that. Else output NoMsg on Cast. 
+            \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Properties of Dolev-Strong}
+            \begin{itemize}
+                \item \textbf{Validity}: When $P_j$ outputs $m$, it does if iff it saw $P_i$ sign it, and $P_i$ only sends $m$ if it is honest.
+                \item \textbf{Agreement}: Let $P_j, P_k$ be honest, then should have $Relayed_j(bid, m) = Relayed_k(bid, m)$ in round $n+2$. There is agreement because there are $n+2$ rounds, so we cannot try to avoid some of the honest parties. It's complicated. ????????
+                \item \textbf{Termination}: It terminates in round $n+2$.  
+            \end{itemize}
+    
+    \end{frame}
 %===================================
 
 \section{Synchronous Broadcast from Authenticated Channels}
+    \begin{frame}
+        \frametitle{Emulating Signatures}
+            We want to be able to emulate signatures with authenticated channels, because distribution of keys and setting up that whole infrastructure could be difficult. Instead, we will seek to emulate signatures with authenticated channels. We can then run Dolev-Strong on top of that.
+    \end{frame}
+        \begin{frame}
+            \frametitle{EmuSig Protocol}
+                We will use the following tools to implement the EmuSig.
+                \begin{itemize}
+                    \item \textbf{HasSeen}: Set of parties claiming to have seen message
+                    \item \textbf{SentBy}: Either has seen party send a message, or $t+1$ have claimed to have seen it. Keeps track of who has sent what
+                    \item \textbf{SignedBy}: If it sure party has sent the message
+                \end{itemize}
+        \end{frame}
+        \begin{frame}
+            \frametitle{EmuSig: This Time It's Protocol}
+                The actual protocol goes as follows
+                \begin{itemize}
+                    \item \textbf{Init}: Set $HasSeen, SignedBy, SentBy = \emptyset$
+                    \item \textbf{Sign}: $P_i$ wants to sign $m$. It sets $SignedBy(P_i, m) = \top$ and sends it. 
+                    \item \textbf{See}: If receiving $(p_i, m)$ add to HasSeen
+                    \item \textbf{Sent I}: If Receiving $(p_i, m)$ from $P_i$ itself, add to $SentBy$
+                    \item \textbf{Sent II}: If more than $t+1$ has seen $(P_i, m)$, add to $SignedBy$
+                \end{itemize}
+        \end{frame}
+        \begin{frame}
+            \frametitle{EmuSig: This Time It's Protocol, Electric Boogie-loo}
+                \begin{itemize}
+                    \item \textbf{Signed}: If $|HasSeen| \geq n-t$ then add it to $SignedBy$
+                    \item \textbf{Transfer I}: If $SignedBy(P_i, m) = \top$ then send $(Transfer, P_i, m)$ to everyone
+                    % \item \textbf{Transfer II}: If you get a transfer where the original sender has signed it, send $(P_i, m)$
+                \end{itemize}
+            
+        
+        \end{frame}
 
 %===================================
 
