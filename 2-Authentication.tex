@@ -31,6 +31,11 @@
 % Replays and how to prevent them
 
 
+\frame{
+    \includegraphics[width=\linewidth]{content/taxanomy.png}
+}
+
+
 %===================================
 \section{Authentication, Secret-Key systems}
 
@@ -48,6 +53,9 @@
 		\textit{Intuition}: The last block depends on the input in a complicated way, and is therefore extremely difficult to forge. 
 	}
 
+    \frame{\frametitle{Cipher Block Chaining MAC}
+        \includegraphics[width=\linewidth]{content/cbc-mac.png}
+    }
 
 	\frame{\frametitle{Authenticity}
 		A secret-key system for Authentication consists of $3$ algorithms: $G, MAC, V$. $G$ generates a key, $MAC$ authenticates messages, $V$ verifies received messages. $G$ usually produces a key by just outputting a random bit string of fixed length. $MAC$ takes as input $m, K$ and outputs a $MAC$. $c = MAC_K(m)$. Then $m, c$ is sent who will run $V_K(m, c) = \{\top, \bot\}$. We require the following
