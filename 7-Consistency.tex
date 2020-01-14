@@ -8,7 +8,6 @@
 
 %===================================
 \begin{document}
-
 \frame{\titlepage} 
 
 \frame{\frametitle{Table of contents}\tableofcontents} 
@@ -39,11 +38,20 @@
     \begin{frame}
         \frametitle{Flood Protocol (Ideal Functionality)}
             \textbf{Send}: Process $P_i$ gives input of form $(P_i, m)$ on user port $Flood_i$
+
+
             \textbf{Deliver} Party $P_i$ gets output of form $(P_j, m)$ on user port $Flood_j$. Message $m$ sent by $P_J$ was delivered to $P_i$ by (flood)
-            We assume that the system has the following properties
-            \textbf{User Contract}: We require from the process $P_i$ that it does not send the same message twice. When the user keeps its contract, we require that the flooding system has the following safety and liveness properties. We also require that in every finite time interval a party sends at most a finite number of messages.
+
             \textbf{Safety}: If a correct $P_j$ outputs $(P_i, m)$ then earlier $P_i$ sent $(P_i, m)$
+
+
             \textbf{Liveness}: If correct $P_i$ sends $(P_i, m)$ then eventually all correct $P_j$ deliver $(P_i, m)$
+    \end{frame}
+
+    \begin{frame}
+            \frametitle{Flood Protocol (Ideal Functionality)}
+        We assume that the system has the following properties
+            \textbf{User Contract}: We require from the process $P_i$ that it does not send the same message twice. When the user keeps its contract, we require that the flooding system has the following safety and liveness properties. We also require that in every finite time interval a party sends at most a finite number of messages.
     \end{frame}
 
 %===================================

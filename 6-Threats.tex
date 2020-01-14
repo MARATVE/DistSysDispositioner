@@ -28,7 +28,7 @@
 
 
 %===================================
-\section{Taxonomy}
+\section{Taxonomy: STRIDE, X.800, EINOO, TPM}
     \begin{frame}
         \frametitle{What attackers want: STRIDE}
             \textit{STRIDE} is a way to categorise attacks according to what the attacker is trying to achieve
@@ -106,7 +106,7 @@ void foo(char* input) {
             Since strings in C are null-terminated, it will continue to copy until it sees the null char. This means that it will write out of bounds of the buffer, and perhaps even into the previous stack frame. This could impact things such as the base pointer and stack pointers or other variables, which are now under the control of the adversary.
     \end{frame}
 
-    \subsection{Unicode Exploits - SKAL FIXES}
+    \subsection{Unicode Exploits}
         \begin{frame}
             \frametitle{The Unicode Exploit}
                 WHAT KIND OF ATTACK MODEL DO WE USE HERE? RELATE TO TAXONOMY
@@ -140,7 +140,7 @@ void foo(char* input) {
         \end{frame}
 
 %===================================
-\section{IBM 4758}
+\section{Example 1: IBM 4758}
         \begin{frame}
             \frametitle{IBM 4758}
                 The case of the IBM 4758 was a case of the security policy being incorrectly specified. 
@@ -167,7 +167,7 @@ void foo(char* input) {
 
 
 %===================================
-\section{Backdoor PRG}
+\section{Example 2: Backdoor PRG}
 \begin{frame}
     \frametitle{PRG}
         A \textit{pseudorandom generator} can be used to extend something random, such as random noise from your computer (think random device on UNIX systems). However, this randomness from the entropy of the computer is usually not enough. Therefore this is expanded with a pseudorandomgenerator. A PRG is an algorithm $G$ which takes an input state $s_i$, and outputs a random \textit{looking} string $r_i$, and the next state $s_{i + 1}$ like so: $(r_i, s_{i +1}) = G(s_i)$. This PRG is initialised with $s_0$, known as the seed. This should be kept secret, otherwise it is possible to predict the sequence of outputs. 
@@ -189,7 +189,7 @@ void foo(char* input) {
 
 
 %===================================
-\section{SPECTRE}
+\section{Example 3: SPECTRE}
 
 \begin{frame}[fragile]
     \frametitle{SPECTRE}
