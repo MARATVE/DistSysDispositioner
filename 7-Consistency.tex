@@ -35,24 +35,7 @@
         \frametitle{Flooding Network}
             A flooding network is a network where messages are flooded. This guarantees that if a message is sent, it will eventually be delivered to all correct processes. When receiving a new message, it is simply sent to all other peers. This means that we cannot guarantee total ordering since messages can overtake each other. 
     \end{frame}
-    \begin{frame}
-        \frametitle{Flood Protocol (Ideal Functionality)}
-            \textbf{Send}: Process $P_i$ gives input of form $(P_i, m)$ on user port $Flood_i$
 
-
-            \textbf{Deliver} Party $P_i$ gets output of form $(P_j, m)$ on user port $Flood_j$. Message $m$ sent by $P_J$ was delivered to $P_i$ by (flood)
-
-            \textbf{Safety}: If a correct $P_j$ outputs $(P_i, m)$ then earlier $P_i$ sent $(P_i, m)$
-
-
-            \textbf{Liveness}: If correct $P_i$ sends $(P_i, m)$ then eventually all correct $P_j$ deliver $(P_i, m)$
-    \end{frame}
-
-    \begin{frame}
-            \frametitle{Flood Protocol (Ideal Functionality)}
-        We assume that the system has the following properties
-            \textbf{User Contract}: We require from the process $P_i$ that it does not send the same message twice. When the user keeps its contract, we require that the flooding system has the following safety and liveness properties. We also require that in every finite time interval a party sends at most a finite number of messages.
-    \end{frame}
 
 %===================================
 \section{Consistency models}
@@ -67,7 +50,8 @@
     \begin{frame}
         \frametitle{FLOOD2FIFO: This Time It's Protocol}
             \begin{itemize}
-                \item Each party $P_i$ sets counter $c_i = 0$. This counts number of \textit{messages sent}ialises $n$ counters $r_{i, j} = 0$ for $j = 1, ..., n$ These track how many messages $P_i$ received from $P_j$
+                \item Each party $P_i$ sets counter $c_i = 0$. This counts number of \textit{messages sent}
+                \item Initialise $n$ counters $r_{i, j} = 0$ for $j = 1, ..., n$ These track how many messages $P_i$ received from $P_j$
                 \item $P_i$: When sending message $m$, let $c_i = c_i + 1$. Send $P_i, c_i, m$ on floodin network. So tag each message with seq number.
                 \item $P_i$. When receiving $(P_j, c, m)$ store it in buffer until $r_{i, j} = c + 1$. Now let $r_{i, j} = r_{i, j} + 1$ and output $(P_j, m)$. Since $r_{i, j}$ is the number of messages $P_i$ received from $P_j$, if $r_{i, j} = c + 1$ then $(P_j, c, m)$ is the next message. 
             \end{itemize}
@@ -78,8 +62,28 @@
 \section{Casuality}
     \begin{frame}
         \frametitle{Causuality}
-            Just because messages arrive in FIFO order, does not mean that this is a meaningful order. \textit{Casual order} looks at which messages could have \textit{caused} other messages. This could be things such as messages in a messaging application. But we need \textit{vector clocks}, before we can proceed. 
+            Just because messages arrive in FIFO order, does not mean that this is a meaningful order. \textit{Casual order} looks at which messages could have \textit{caused} other messages. This could be things such as messages in a messaging application. To fix this, we send the \textit{casual past} of messages with it. This is the set of messages that could have influenced the message that we sent. 
+
     \end{frame}
+
+    \begin{frame}
+        \frametitle{Causal-Past Relation}
+            There is a notion that certain messages could have \textit{caused} other messages. Or "the happens-before relation". 
+
+            \textbf{Kasusel-past relation}: $(P_i, m_i) \hookrightarrow (P_j, m_j)$
+        
+            If there is a chance that $m_j$ depends on $m_i$, then we treat it as if that is the case. 
+
+            Denote $CasualPast(P_j, m) = \{(P_i, m_i) | (P_i, m_i) \hookrightarrow (P_j, m_j) \}$ the set of things that may depend on $(P_i, m_i)$. 
+
+            We can similarly define a \textit{Kausual Future}. 
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Casual-Past Relation}
+            Sending the entire set of messages that we have received along with a message is a lot of data. Instead of this, we will use vector clocks.
+    \end{frame}
+
     \begin{frame}
         \frametitle{Vector Clocks}
             For a system of $n$ parties, a \textit{vector clock} is a vector $VectorClock \in \N^n$ where $VectorClock[P_j] \in \N$ where that is the entry associated with party $P_j$. Since each party has a vector clock, VectorClock($P_i$) is the vector clock of $P_i$.
@@ -105,18 +109,6 @@
             \end{itemize}
     \end{frame}
 
-    \begin{frame}
-        \frametitle{Causal-Past Relation}
-            There is a notion that certain messages could have \textit{caused} other messages. Or "the happens-before relation". 
-
-            \textbf{Kasusel-past relation}: $(P_i, m_i) \hookrightarrow (P_j, m_j)$
-        
-            If there is a chance that $m_j$ depends on $m_i$, then we treat it as if that is the case. 
-
-            Denote $CasualPast(P_j, m) = \{(P_i, m_i) | (P_i, m_i) \hookrightarrow (P_j, m_j) \}$ the set of things that may depend on $(P_i, m_i)$. 
-
-            We can similarly define a \textit{Kausual Future}. 
-    \end{frame}
 
     \begin{frame}
         \frametitle{C-ass-ual network: In Practice}
@@ -132,7 +124,7 @@
 \section{Total order}
     \begin{frame}
         \frametitle{Total Order}
-            \textbf{Total Order}: If correct $P_k$ delivered $(P_i, m)$ and laterdelivered $(P_j, m')$. Then it holds for all $P_m$ that if they deliver $(P_j, m')$ they delivered $(P_i, m)$ earlier. 
+            \textbf{Total Order}: If correct $P_k$ delivered $(P_i, m)$ and later delivered $(P_j, m')$. Then it holds for all $P_m$ that if they deliver $(P_j, m')$ they delivered $(P_i, m)$ earlier. 
         
             We can implement this using Kasusel ordering and Vector Clocks. 
     \end{frame}
