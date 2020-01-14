@@ -131,14 +131,7 @@
 
         \begin{frame}
             \frametitle{TOB from Casuselss and shizzle}
-                \begin{itemize}
-                    \item \textbf{Init}: For each $P_i$ it keeps $InTransist = UnOrdered \emptyset$
-                    \item \textbf{Send}: On input $(P_i, m)$ on $Flood_i$ output $(P_i, m)$ and add $(P_i, m) \rightarrow Unordered$
-                    \item \textbf{Order}: On input $(P_i, m)$ on Order, if $(P_i, m) \in Unordered$ then pop and add it to the queue $InTransit_j$
-                    \item \textbf{Deliver}: On input $P_i$ on Deliver, pop $InTransit$ and output it.   
-                \end{itemize}
-            
-        
+                We do this by achieving causual order, and then using a deterministic method for determining the order of concurrent messages. Such as lexocographically. 
         \end{frame}
 
 \end{document}
