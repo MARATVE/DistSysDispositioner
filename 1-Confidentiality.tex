@@ -13,6 +13,11 @@
 \frame{\frametitle{Table of contents}\tableofcontents} 
 
 
+\frame{
+    \includegraphics[width=\linewidth]{content/taxanomy.png}
+}
+
+
 %===================================
 \section{Unconditional security} 
 
@@ -41,7 +46,11 @@
     An algorithm $X$, which expends a short key $k$, and a nonce $n$ to a longer \textit{looking} string $X(k, n)$. Which is then used to encrypt a message \textit{as if} it was a one-time pad. That is, $c = m \bigoplus X(k, n)$. Decryption happens with $c = \bigoplus X(k, n) = m \bigoplus X(k, n) \bigoplus X(k, n) = m$.   
 
     Stream algorithms do not produce truly random outcomes. We cannot output more than $2^{length}$ different strings. (TJEK DET HER FARMAND SIDE 130) 
-}    
+}
+
+\frame{\frametitle{Stream Ciphers}
+    \includegraphics[width=\linewidth]{content/stream-cipher-enc.png}
+}
 
 \frame{\frametitle{Block ciphers}
     Block ciphers encrypt a fixed size block of data, and outputs a block of the same size. Block ciphers have \textit{modes of operation} (such as Cipher Block Chaining, Counter \& Output feedback). 
@@ -68,12 +77,22 @@
 }
 
 \frame{
+    \frametitle{CBC: Cipher Block Chaining}
+    \includegraphics[width=\linewidth]{content/cbc-enc.png}
+}
+
+\frame{
     \frametitle{CTR: Counter Mode}
         Let the message be $M_1, ..., M_t$ and the ciphertext depending on $IV$. The cipher text will be $t + 1$ blocks $C_0, ..., C_t$ where $C_0 = IV$ and for $i = 1, ..., t$
         \begin{align*}
             C_i = AES_K(IV + i) \bigoplus M_i
         \end{align*}
         $IV + 1$ means that $IV$ is a 128-bit number. Add $i \text{ mod }2^{128}$. CTR makes it easier to decrypt several blocks than CBC in parallel. 
+}
+
+\frame {
+    \frametitle{CTR: Counter Mode}
+    \includegraphics[width=\linewidth]{content/ctr-enc.png}
 }
 
 \section{Computational Security, public-key systems}
