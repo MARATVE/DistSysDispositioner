@@ -52,11 +52,11 @@
 }
 \subsection{CBC/CTR/OFB modes}
 \frame{\frametitle{OFB: Output Feedback}
-    Can be used in a similar way to a stream cipher. Take AES with an encryption function $AES_K()$ as an example block cipher, we can compute
+    Generate a keystream. Take a nonce $IV$, then apply AES to it repeatedly. 
     \begin{align*}
         AES_K(IV), AES_K(AES_K(IV)), ...,
     \end{align*}
-    In other words, we simply chain together the blocks. 
+    Then we can XOR that with the message. 
 }
 \frame{
     \frametitle{CBC: Cipher Block Chaining}
