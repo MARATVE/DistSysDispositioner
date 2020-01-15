@@ -31,40 +31,60 @@
 \section{Asynchronous Model}
     \begin{frame}
         \frametitle{The asynchronous model}
-            In the async model, we have the following properties: Messages can be delayed for arbitrarily long, and we have interested in the following properties:
-            \begin{itemize}
-                \item \textbf{Agreement}: All honest parties make the same decision
-                \item \textbf{Validity}: Decision made must be sensible in some sensible
-                \item \textbf{Termination}: If all parties run the protocol, eventually all honest parties will make a decision
-            \end{itemize}
-            Additionally, we say that the protocol does not guarantee liveness until all parties start running it, since people can fail arbitrarily long behind. 
+           With the asynchronous model, we have no notion of clocks. 
+
+           We have no timeouts
+
+           We only have eventual delivery of messages. 
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{The asynchronous model}
+        \begin{itemize}
+            \item \textbf{Agreement}: All honest parties make the same decision
+            \item \textbf{Validity}: Decision made must be sensible in some sensible
+            \item \textbf{Termination}: If all parties run the protocol, eventually all honest parties will make a decision
+        \end{itemize}
+        Additionally, we say that the protocol does not guarantee liveness until all parties start running it, since people can fail arbitrarily long behind. 
     \end{frame}
 
 \styleA
 \section{Asynchronous Broadcast}
-    \subsection{Definition}
+    \subsection{From signatures}
     \begin{frame}
-        \frametitle{Defining Asynchronous Broadcast}
-            We build it on ACast and we use a simple PKI \textit{ToyPKI}. 
+        \frametitle{Async Broadcast from signatures}
+            \begin{itemize}
+                \item We build it with ACast and a simple \textit{ToyPKI}
+                \item We will use signatures. A broadcaster $P_i$ will ask all parties to sign the message
+                \item To broadcast, wait for $n-t$ signatures. 
+                \item Receiver outputs only if it has $n-t$ signatures
+            \end{itemize}                
+        \end{frame}
+        \begin{frame}
+            \frametitle{Async Broadcast from signatures 2: This Time It's Protocol}
+                \begin{itemize}
+                    \item \textbf{Request signatures}: To send a message, send it on ACast. We ask that $n-t$ sign that message.
+                    \item \textbf{Grant signatures}: When receiving a message, add your signature to it and send it back to the receiver (on the flooding network)
+                    \item \textbf{Collect signatures}: The sender collects $n-t$ signatures. 
+                    \item \textbf{Send signatures}:  When sender has collected $n-t$ signatures, broadcast it. When reciving a message signed by $n-t$, output it. 
+                \end{itemize}
+        \end{frame}
 
-            Asynchronous Broadcast uses signatures. A broadcaster $P_i$ will ask all $n$ parties to sign message $m$ it sends. All parties thus sign at most one $m$ for each $P_i$. Then $P_i$ waits for $n - t$ parties to send a signature. To broadcast, $P_i$ sends $m$ along with $n -t$ signatures. A receiver only outputs $m$ if it has $n - t$ signatures. On output, pass it along to everyone else with a signature, who will then also output $m$. 
-    \end{frame}
+
     \begin{frame}
-        \frametitle{Agreement - Dafuq}
+        \frametitle{Agreement}
             If two honest $P_j, P_k$ output $m_j, m_k$, then we want $m_j = m_k$. If there are $t$ corrupted (possibly including sender $P_i$) then we have the following argument: 
             Each party sees $n - t$ distinct signatures. If all corrupt $t$ parties sign both $m_j, m_k$ (causing them to be output), this gives us at most $2t$ signatures. This gives us a total of $(n -t) + 2t = n+t$ distinct signatures on either $m_j$ or $m_k$. 
-
-            If $m_j \neq m_k$ then all signatures on both are distinct. So in this case we have $(n-t) + (n-t)$ distinct signatures. We know that $n-t = 2t +1$ so $(n-t) + (n-t) = (n-t) + (2t + 1) = n + t +1$ which is greater than the $n+t$ we have just proved. So $m_j = m_k$.
     \end{frame}
 
     \begin{frame}
-        \frametitle{Validity - Dafuq???}
+        \frametitle{Validity}
             Honest parties output $m$ from $P_i$ if it sees at least $n -t$ signatures. But then it saw at least $(n-t) - t = t + 1$ signatures from honest parties. But then $t + 1 \geq 1$ honest parties signed $m$. And honest parties only sign the $m$ that comes from $P_i$.
     \end{frame}
 
     \begin{frame}
         \frametitle{Termination}
-            If $P_i$ is honest, it asks all honest parties to sign $m$. At least $n-t$ honest grant signatures. $P_i$ at some point receives $n-t$ signatures on $m$. It the nforwards them so all honest $P_j$ receives $m$ with $n-t$ signatures, and so they output $m$.
+            If $P_i$ is honest, it asks all honest parties to sign $m$. At least $n-t$ honest grant signatures. $P_i$ at some point receives $n-t$ signatures on $m$. it then forwards them so all honest $P_j$ receives $m$ with $n-t$ signatures, and so they output $m$.
     \end{frame}
 
     \subsection{Bracha Broadcast}
@@ -82,9 +102,19 @@
     \begin{frame}
         \frametitle{Bracha Broadcast}
             \textbf{Send}: $P_1$: On input (BROADCAST, $P_1$, bid, $m$), send (SEND, $P_1$, bid, $m$) to all parties
+
+
             \textbf{Echo}: $P_i$: On message (SEND, $P_1$, bid, $m$) from $P_1$, send (ECHO, $P_1$, bid, $m$)
+
+
             \textbf{Ready 1}: $P_i$ once message (ECHO, $P_1$, bid, $m$) has been received from $n -t$ parties, send (READY, $P_1$, bid, $m$)
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Bracha Broadcast}
             \textbf{Ready 2}: $P_i$ once message (READY, $P_1$, bid, $m$) has been received from $t+1$ parties, send (READY, $P_1$, bid, $m$) to all parties if not yet done
+
+
             \textbf{Deliver}: Once message (READY, $P_1$, bid, $m$), has been received from $n-t$ parties, output (DELIVER, $P_1$, bid, $m$) and terminate the protocol
     \end{frame}
 
@@ -98,90 +128,6 @@
 
             We also need $n > 3t$ to ensure common correct party between two parties. (BEVIS SIDE 210?)
     \end{frame}
-
-
-\styleB
-\section{Asynchronous Byzantine Agreement}
-    \subsection{Asynchronous Agreement}
-        \begin{frame}
-            \frametitle{Defining Asynchronous Byzantine Agreement}
-                In Asynchronous Byzantine Agreement. The parties try to agree on some decision. We tolerate $t = \frac{n}{3}$ Byzantine corrupted parties. 
-                
-                The main idea is to try to stabilise the network so that all honest parties have the same vote. You run a sequence of protocols to update votes. These have the properties that they stabilise the network and the parties end up in agreement.             
-        \end{frame}
-
-        \begin{frame}
-            \frametitle{Vote Updating Protocols}
-                \textbf{Definition 9.2}: An async protocol is \textit{vote updating protocol} (VUP). The protocol is as follows:
-                    \begin{itemize}
-                        \item Each party starts with $V_i \in \{0, 1\}$ 
-                        \item It should be \textit{terminating}. All honest terminate with updated vote $W_i \in \{0, 1\}$
-                        \item Inputs are \textit{stable on V} if all honest have $V_i = V$
-                        \item Protocol is \textit{stability preversing} if when inputs are stable, then outputs are also stable 
-                        \item VUP is a $\sigma$-stabiliser if for all configurations of input, that the outputs are stable with probability at least $\sigma$
-                        \item VUP is \textit{detector} if it inputs to each party a truth vaue $D_i \in \{\top, \bot \}$. if input is stable, then $D_i = \top$ for all honest parties if output is stable. 
-                    \end{itemize} 
-        \end{frame}
-
-            \begin{frame}
-                \frametitle{Basic VUP}
-                    We can implement a basic VUP using signatures. Each $P_i$ sends signed $V_i$. Collect $n-t$ signatures and pick $J_i \in \{0, 1\}$ with $t+1$ signatures. Send \textit{justified vote} $J_i$ with the signatures. Collect $n-t$ justified votes. If they are the same, then $W_i = j$ is a \textit{hard vote}. Otherwise pick somehow a \textit{soft vote}. 
-            \end{frame}
-            \begin{frame}
-                \frametitle{Stabilising Vote Updating Protocol}
-                    Each $P_i$ runs: Send $V_i$ to all parties with signature. Collect $n-t$ signatures. Pick $J_i \in \{0, 1\}$ with $t+1$ distinct signatures. ACast the justified vote $J_i$ to all parties with their signatures. Collect $n-t$ justified votes. If they are all the same, hard vote it. $W_i = J$. Otherwise uniformly randomly pick a soft vote $W_i$. 
-
-                    ACast is used to prove \textbf{Lemma 9.3 (SVUP)}:. It holds that if an honest party saw $t+1$ justified votes for bit $J$, then no honest party gave or will give a hard vote for $W \neq J$. 
-            \end{frame}
-
-            \begin{frame}
-                \frametitle{SVUPPERE}
-                    Flere af disse kan evt tilføjes, men slides siger at man også skal nå at dække sektion 9.6
-            \end{frame}
-
-    \subsection{Asynchronous Termination}
-            \begin{frame}
-                \frametitle{Asynchronous Termination}
-                    \textbf{Definition 9.6 (Asynchronous Termination)}: When a party terminates, it terminates its own process, plus its processes in any sub-protocols. With one exception: It will forever run the process that implements delivery on the authenticated channels its using. 
-
-                    This could be delegated to to the OS or some other daemon. If a correct process terminates, it can affect liveness of sub-protocols. It cannot affect safety properties. Termination is equivalent to its messages being delayed arbitrarily. With \textit{piggy bagging}, you can send these time capsule messages along with the next message in the main protocol. This way, messages can be delivered even if the sender terminates the protocol. 
-
-                    Basically. When a process is done with a subprotocol, it may stay alive to help other processes finish. This way, everyone can shut down quickly
-            \end{frame}
-
-            \begin{frame}
-                \frametitle{Vote Updating Protocol Byzantine Agreement}
-                    \textbf{Input}: From $P_i$, on input (VOTE, baid, $v_i$). Let $V_{i}^0 = v_i$. Let $r = 0$. Let $GaveOutput = \bot$. Start stabilise and then output
-
-                    \textbf{Stabilize}: From $P_i$, keep running:
-                    \begin{enumerate}
-                        \item Run SVUP with input $V_{i}^r$ to get $W_{i}^r$
-                        \item Run DeVUP with input $W_{i}^r$ to get $V_{i}^{r+1}$ and $D_{i}^r$
-                        \item If $D_{i}^r = \top$, then output (DECISION, baid, $V_{i}^{r+1}$). Let $GaveOutput = \top$ and send (TIMECAP, $V_{i}^{r+1}$) to all parties. 
-                        \item Let $r \leftarrow r + 1$ and repeat step 1
-                    \end{enumerate}
-                    The TimeCapsule is delivered even if the sender terminates VUPABA. 
-            \end{frame}
-            \begin{frame}   
-                \frametitle{Vote Updating Protocol Byzantine Agreement 2}
-                    \textbf{Output}: From $P_i$:
-                        \begin{itemize}
-                            \item \textbf{Term 1} On Receiving (TimeCAP, d) from $t+1$ parties, send (TIMECAP, d) to all parties. If $GaveOutput = \bot$, then set $GaveOutput = \top$ and output (Decision, baid, d)
-                            \item \textbf{Term 2} On receiving (TIMECAP, d) from $2t + 1$ parties, terminate
-                        \end{itemize}
-            \end{frame}
-
-            \begin{frame}
-                \frametitle{ABA from VUP and TIme Capsule}
-                    This protocol implements Asynchronous Byzantine Agreement. When a party $P_i$ sees that $D_{r}^r = \top$, then it knows that the network is stable and other parties will realise it next round. It keeps running to ensure that others reach the next round. When enough reaches next round, ensuring that enough time capsules are around, it can terminate. The two tresholds in the shutdown mechanism is the same as in Bracha Broadcast. 
-            \end{frame}
-
-            \begin{frame}
-                \frametitle{ARGUE }
-                    NEEDS MORE OF IT RIGHT HERE POENTIALLY
-                
-            
-            \end{frame}
 
 
 \end{document}
